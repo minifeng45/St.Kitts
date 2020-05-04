@@ -1,8 +1,7 @@
 library(ggplot2)
-source("(Function) Data_partition.R")
-setwd("/Users/supermonk00/Desktop/academy/programing/R/St.Kitts/Code")
-source("Sweet pepper PivotTable report.R")
-source("(Function)AvgTempinPeriod_caculate.R")
+library(devtools)
+devtools::source_url("https://raw.githubusercontent.com/supermonk00/St.Kitts/master/WS_reg/WS.data_processing.R")
+devtools::source_url("https://raw.githubusercontent.com/supermonk00/St.Kitts/master/SP_Trial/SP_PivotTable_report.R")
 ##### Pre-process the data to a plot form#####
 
 #### (lead in the temperature information)
