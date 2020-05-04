@@ -1,5 +1,5 @@
-###Fruit on plants
-# insert data
+###Fruit on plants####
+# insert data, hand-written data
 purple_trim = c(13,10,18,9,22,8,11,22,24,11,26,27,17,
                 24,13,20,12,25,21,31)
 purple_notrim = c(20,32,24,20,23,19,32,20,25,22)
