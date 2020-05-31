@@ -1,5 +1,5 @@
 library(devtools)
-devtools::source_url("https://raw.githubusercontent.com/supermonk00/St.Kitts/master/SP_Trial/SP_Data_insert.R")
+source("/Users/supermonk00/Desktop/programing/R/St.Kitts/SP_Trial/SP_Data_insert.R")
 
 #Total harvest data
 purple_total = rbind(purple_before_trim,purple_notrim,purple_trim)[,-1]

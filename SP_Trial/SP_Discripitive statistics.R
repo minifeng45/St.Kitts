@@ -1,7 +1,8 @@
 library(ggplot2)
-library(devtools)
-devtools::source_url("https://raw.githubusercontent.com/supermonk00/St.Kitts/master/WS_reg/WS.data_processing.R")
-devtools::source_url("https://raw.githubusercontent.com/supermonk00/St.Kitts/master/SP_Trial/SP_PivotTable_report.R")
+library(dplyr)
+
+source("/Users/supermonk00/Desktop/programing/R/St.Kitts/WS_reg/WS.average_temperature.R")
+source("/Users/supermonk00/Desktop/programing/R/St.Kitts/SP_Trial/SP_PivotTable_report.R")
 ##### Pre-process the data to a plot form#####
 
 #### (lead in the temperature information)
@@ -9,37 +10,34 @@ month_temp = Dailytemperature_calculate(
   filename = "Needsmust.csv",
   start_day = "2019/10/11",
   end_day = "2020/03/23",
-  daysforavg = 30,daysfordivid = 7)
+  including.period = 30,divided.period  = 7)
 
 # insert temperature data, replicate for two variety
-temperature = rep(c(month_temp[,1]),2)
+temperature = rep(c(month_temp$temperature.average),2)
 
 ### set the week data, replicate for two variety
-Week = rep(c(1:length(Harvest$Date)),2)
+Week = rep(c(1:length(Harvest$Date)),2) 
 
 ### reform to the plot-acceptable dataframe
-Variety = rep("Purple",length(Harvest$Date))
-Weight = Harvest$Purple_weight
-purple = data.frame(Weight,Variety)
 
-Variety = rep("Red",length(Harvest$Date))
-Weight = Harvest$Red_weight
-red = data.frame(Weight,Variety)
+purple = data.frame(Weight = Harvest$Purple_weight,Variety = "Purple")
 
-rm(Weight,Variety)
+red = data.frame(Weight = Harvest$Red_weight, Variety = "Red")
+
+
 
 # tidy up to an intergated dataframe #
-dat = data.frame(Week,rbind(purple,red))
+Dataset_weekly.harvest = data.frame(Week,rbind(purple,red))
 
 
 
 #####barplot & linegraph for weekly harvest(Sweet Pepper Harvest Overall)######
 
 # set plot, x-axis
-p = ggplot(data = dat, aes(x = Week))
+p.overall.harvest = ggplot(data = Dataset_weekly.harvest, aes(x = Week))
 
 # draw barchart
-p = p + geom_bar(aes(y= Weight,fill = Variety), 
+p.overall.harvest = p.overall.harvest + geom_bar(aes(y= Weight,fill = Variety), 
                  stat = "identity", 
                  position="dodge",
                  width = 0.5)+
@@ -54,12 +52,12 @@ b <- diff(ylim.prim)/diff(ylim.sec)
 a <- b*(ylim.prim[1] - ylim.sec[1])
 
 # draw linegraph
-p = p +
+p.overall.harvest = p.overall.harvest +
   geom_line(aes(y = a+temperature*b))+
   geom_point(aes(y = a+temperature*b))+
   theme(axis.title.y = element_text(vjust = 1,size = 15), 
         axis.title.x = element_text(size = 15))+
-  scale_y_continuous(name = "Weight(g)", 
+  scale_y_continuous(name = "Weight(g)",
                      sec.axis = sec_axis(~(.-a)/b ,name ="Temperature(°C)"))+ #set second axis
   scale_x_continuous(name = "Week(2019/11/11-2020/03/23)", breaks = c(Week))+
   ggtitle("Sweet Pepper Harvest Overall")
@@ -69,111 +67,101 @@ p = p +
 #####Scatter of Temperature & Productivity Correlation####
 
 ## Purple 
+lm.p.data = data.frame(temperature = month_temp$temperature.average, weight =Harvest$Purple_weight )
+lm_p = lm(weight~temperature,data =lm.p.data) %>%
+  summary()
 
-lm_p = summary(lm(Harvest$Purple_weight~month_temp[,1]))
 
-plot(month_temp[,1], Harvest$Purple_weight,pch=".",cex= 5, 
-     ylab = "Weekly harvest(g)",
-     xlab = "Monthly temperature average before harvest",
-     main = "Linear regression of harvest~temperature(Purple)")
-abline(lm_p, col = "purple")
-text(29,70000,as.expression(substitute(italic(adj.R)^2 == r, list(r = round(lm_p$adj.r.squared, 
-                                                                            3)))))
+
+lm.information.label.p = as.expression(substitute(italic(adj.R)^2 == r, list(r = round(lm_p$adj.r.squared,3))))
+
+p.lm.purple = ggplot(lm.p.data,aes(x =temperature, y  =  weight))+
+         geom_point()+
+         labs(x = "Monthly temperature average before harvest",
+              y = "Weekly harvest(g)")+
+  geom_smooth(method = "lm", se = FALSE,col = "purple")+
+  annotate("text", x = 28.5, y = 70000, 
+           label = lm.information.label.p)
 
 
 ## Red
+lm.r.data = data.frame(temperature = month_temp$temperature.average, weight =Harvest$Red_weight)
+lm_r = lm(weight~temperature,data = lm.r.data)%>%
+  summary()
 
-lm_r = summary(lm(Harvest$Red_weight~month_temp[,1]))
-# 'cause R-squared (Red) is low, strech the loess line
-loes = loess(Harvest$Red_weight~month_temp[,1])
-smoothed <- predict(loes)
+lm.information.label.r = as.expression(substitute(italic(adj.R)^2 == r, list(r = round(lm_r$adj.r.squared,3))))
 
-plot(month_temperature, Harvest$Red_weight)
-abline(lm_r, col = "red")
-lines(smoothed, x=month_temp[,1], col="grey")
-text(29,20000,as.expression(substitute(italic(adj.R)^2 == r, list(r = round(lm_r$adj.r.squared, 
-                                                                            3)))))
+
+p.lm.red = ggplot(lm.r.data,aes(x =temperature, y  =  weight))+
+  geom_point()+
+  labs(x = "Monthly temperature average before harvest",
+       y = "Weekly harvest(g)")+
+  geom_smooth(method = "lm", se = FALSE,col = "red")+
+  geom_smooth(method = "loess", se = FALSE,col = "grey")+ # 'cause R-squared (Red) is low, strech the loess line
+  annotate("text", x = 28.5, y = 25000, 
+           label = lm.information.label.r)+
+  annotate("segment", x = 26.3, xend = 26.5, y = 5000, yend = 9500, colour = "grey", size=1, alpha=0.9, arrow=arrow())+
+  annotate("text", x = 26.3, y = 4300,label="Extra:Loess for fitting data",colour = "grey",size=4)
 
 ####Fruit Weight distribution####
 
 # reform to the plot-acceptable dataframe
-
-Variety = rep("Purple",length(purple_total$Date))
-Weight = purple_total$`Weight(g)`
-purple = data.frame(Weight,Variety)
-
-Variety = rep("Red",length(red_total$Date))
-Weight = red_total$`Weight(g)`
-red = data.frame(Weight,Variety)
-
-# tidy up to an intergated dataframe #
-
-dat = data.frame(rbind(purple,red))
+Dataset_individual.weight = rbind(
+  data.frame(Weight = purple_total$`Weight(g)`,Variety ="Purple"),
+  data.frame(Weight = red_total$`Weight(g)`,Variety = "Red")
+)
 
 #### boxplot, show the diversity of weight, max, mid, min, etc####
 
-box = ggplot(dat,aes(x = Variety, y=Weight,fill=Variety))+
-  geom_boxplot()+
+p.box_weight.distribution = ggplot(Dataset_individual.weight,aes(x = Variety, y=Weight,fill=Variety))+
+  geom_boxplot(alpha = 0.8)+
   scale_fill_manual(values = c("purple", "red"))+
   ggtitle("Boxplot: Fruit Weight Distribution")+
   ylab("Fruit weight(g)")
 
-rm(box)
 
 #### boxplot, show the trim/notrim weight(Purple) distribution, max, mid, min, etc####
 
-dat = rbind(purple_notrim,purple_trim)
-Treatment =c(rep("notrim",nrow(purple_notrim)),rep("trim",nrow(purple_trim)))
-data = data_frame(weight = dat$`Weight(g)`,trt = Treatment)
+Dataset_trimtrial.individual= rbind(
+  data.frame(Weight = purple_notrim$`Weight(g)`,
+            Treatment = "notrim"),
+  data.frame(Weight = purple_trim$`Weight(g)`,
+             Treatment = "trim"))
 
 # boxplot show the trim/notrim(purple) distribution
-p = ggplot(data = data, aes(x = trt))
-p = p + geom_boxplot(aes(y= weight))+
+p.box_trimtrial = ggplot(data = Dataset_trimtrial.individual, aes(x = Treatment))
+p.box_trimtrial = box_trimtrial + geom_boxplot(aes(y= Weight))+
   labs(title = "Fruit Weight Distribution",
        subtitle = "Purple",
-       x = "Treatment",y = "Weight(g)")
+       y = "Weight(g)")
 
 # t.test for assessment of difference of the average weight 
-t.test(data$weight[which(data$trt =="notrim")], 
-       data$weight[which(data$trt =="trim")], paired=FALSE)
+t.test(Dataset_trimtrial.individual$Weight[which(Dataset_trimtrial.individual$Treatment =="notrim")], 
+       Dataset_trimtrial.individual$Weight[which(Dataset_trimtrial.individual$Treatment =="trim")], paired=FALSE)
 
 ##### Trim Treatment result ####
 
-setwd("/Users/supermonk00/Desktop/academy/programing/R/St.Kitts/Code")
-source("SweetpepperTrimtreatmentPivotable.R")
-
 ## for purple
 
-Treatment = rep("Trim",4)
-Weight = c(Harvest_treatment_p$Purple_trim[17:20])
-TRIM = data.frame(Weight,Treatment)
-
-Treatment = rep("Notrim",4)
-Weight = c(Harvest_treatment_p$Purple_notrim[17:20])
-Notrim = data.frame(Weight,Treatment)
-
-Treatment = rep("Trim",4)
-mu = c(Harvest_treatment_p$mu_trim[17:20])
-sd = c(Harvest_treatment_p$sd_trim[17:20])
-pv_trim = data.frame(mu,sd)
-
-Treatment = rep("Notrim",4)
-mu = c(Harvest_treatment_p$mu_notrim[17:20])
-sd = c(Harvest_treatment_p$sd_notrim[17:20])
-pv_notrim = data.frame(mu,sd)
-
-rbind(pv_trim,pv_notrim)
-Week = rep(c(1:4),2)
-
-# tidy up to an intergated dataframe #
-
-dat = data.frame(cbind(rbind(TRIM,Notrim),rbind(pv_trim,pv_notrim)))
+Dataset_trimtrial.weekly.harvest.p = rbind(
+  
+  Harvest_treatment_p %>%
+    filter(Purple_trim != 0,Purple_notrim != 0)%>%
+    select(Weight = Purple_trim, mu = mu_trim, sd = sd_trim)%>%
+    mutate(Treatment = "Trim"),
+  
+  Harvest_treatment_p %>%
+    filter(Purple_trim != 0,Purple_notrim != 0)%>%
+    select(Weight = Purple_notrim, mu = mu_notrim, sd = sd_notrim)%>%
+    mutate(Treatment = "Notrim")
+) %>%
+  mutate(Week = rep(c(1:4),2))
 
 #Barchart, show total weight of Treatment or not
 
-p = ggplot(data = dat, aes(x = Week))
+p.trimtrial.total.weight.p = ggplot(data = Dataset_trimtrial.weekly.harvest.p, aes(x = Week))
 
-p = p + geom_bar(aes(y= Weight,fill = Treatment),
+p.trimtrial.total.weight.p = p.trimtrial.total.weight.p + geom_bar(aes(y= Weight,fill = Treatment),
                  stat = "identity", 
                  position="dodge",
                  width = 0.5)+
@@ -182,11 +170,11 @@ p = p + geom_bar(aes(y= Weight,fill = Treatment),
   ylab("Total weight(g)")+
   ggtitle("TrimTrial:Total Weight",subtitle = "Purple")
 
-p2 = ggplot(data = dat, aes(x = Week,y = mu,fill = Treatment))+
+p.trimtrial.average.weight.p = ggplot(data = Dataset_trimtrial.weekly.harvest.p, aes(x = Week,y = mu,fill = Treatment))+
   geom_col(position = 'dodge', width = 0.5)+
   scale_fill_manual(values = c("#DCDCDC", "#696969"))+
-  geom_errorbar(aes(x=Week, ymin=mu-sd, ymax=mu+sd),  # 添加误差线
-                width=0.1, color='black', position = position_dodge(0.5),  # 设置误差线颜色，宽度等
+  geom_errorbar(aes(x=Week, ymin=mu-sd, ymax=mu+sd),  # add errorbar
+                width=0.1, color='black', position = position_dodge(0.5),  # set colors, width of errorbar
                 size=0.3)+
   scale_x_continuous(name = "Week(2020/02/24-2020/03/23)", breaks = c(Week))+
   ylab("Average weight(g)")+
@@ -199,34 +187,25 @@ p2 = ggplot(data = dat, aes(x = Week,y = mu,fill = Treatment))+
 
 
 ##for red
-Treatment = rep("Trim",4)
-Weight = c(Harvest_treatment_r$Red_trim[17:20])
-TRIM = data.frame(Weight,Treatment)
 
-Treatment = rep("Notrim",4)
-Weight = c(Harvest_treatment_r$Red_notrim[17:20])
-Notrim = data.frame(Weight,Treatment)
-
-
-Treatment = rep("Trim",4)
-mu = c(Harvest_treatment_r$mu_trim[17:20])
-sd = c(Harvest_treatment_r$sd_trim[17:20])
-pv_trim = data.frame(mu,sd)
-
-Treatment = rep("Notrim",4)
-mu = c(Harvest_treatment_r$mu_notrim[17:20])
-sd = c(Harvest_treatment_r$sd_notrim[17:20])
-pv_notrim = data.frame(mu,sd)
-
-rbind(pv_trim,pv_notrim)
-Week = rep(c(1:4),2)
-
-dat = data.frame(cbind(rbind(TRIM,Notrim),rbind(pv_trim,pv_notrim)))
+Dataset_trimtrial.weekly.harvest.r = rbind(
+  
+  Harvest_treatment_r %>%
+    filter(Red_trim != 0,Red_notrim != 0)%>%
+    select(Weight = Red_trim, mu = mu_trim, sd = sd_trim)%>%
+    mutate(Treatment = "Trim"),
+  
+  Harvest_treatment_r %>%
+    filter(Red_trim != 0,Red_notrim != 0)%>%
+    select(Weight = Red_notrim, mu = mu_notrim, sd = sd_notrim)%>%
+    mutate(Treatment = "Notrim")
+) %>%
+  mutate(Week = rep(c(1:4),2))
 
 #plot 
-p = ggplot(data = dat, aes(x = Week))
+p.trimtrial.total.weight.r = ggplot(data = Dataset_trimtrial.weekly.harvest.r, aes(x = Week))
 
-p = p + geom_bar(aes(y= Weight,fill = Treatment),
+p.trimtrial.total.weight.r = p.trimtrial.total.weight.r + geom_bar(aes(y= Weight,fill = Treatment),
                  stat = "identity", 
                  position="dodge",
                  width = 0.5)+
@@ -234,7 +213,7 @@ p = p + geom_bar(aes(y= Weight,fill = Treatment),
   scale_x_continuous(name = "Week(2020/02/24-2020/03/23)", breaks = c(Week))+
   ylab("Total weight(g)")+
   ggtitle("TrimTrial:Total Weight",subtitle = "Red")
-p2 = ggplot(data = dat, aes(x = Week,y = mu,fill = Treatment))+
+p.trimtrial.average.weight.r = ggplot(data = Dataset_trimtrial.weekly.harvest.r, aes(x = Week,y = mu,fill = Treatment))+
   geom_col(position = 'dodge', width = 0.5)+
   scale_fill_manual(values = c("#DCDCDC", "#696969"))+
   geom_errorbar(aes(x=Week, ymin=mu-sd, ymax=mu+sd), 
@@ -243,3 +222,5 @@ p2 = ggplot(data = dat, aes(x = Week,y = mu,fill = Treatment))+
   scale_x_continuous(name = "Week(2020/02/24-2020/03/23)", breaks = c(Week))+
   ylab("Average weight(g)")+
   ggtitle("TrimTrial:Average Weight",subtitle =  "Red")
+
+

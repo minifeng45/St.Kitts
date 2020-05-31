@@ -9,17 +9,15 @@ library(caret)
 ###source sensor, weather station data
 
 
-setwd("/Users/supermonk00/desktop/academy/programing/R/St.Kitts/Code")
-source("(Function) Data_partition.R")
-
+source("/Users/supermonk00/Desktop/programing/R/St.Kitts/WS_reg/WS.data_partition.R")
 
 ### find regression: in day & in night
 
-WSD = data_partition(Datasource = "CR300Series-direct-Needsmust_Minutely_record.dat",
+WSD = data_partition(Datasource = "La Guerite_five_min.dat",
                      start_day = "2019/8/29",
                      end_day = "2020/04/12",
                      Partition_Way = 1) # 1 for day/night, 2 for monthly, 3 for both
-HSD = data_partition(Datasource = "Needsmust.csv",
+HSD = data_partition(Datasource = "La Guerite 2 2020-04-12 15_07_43 -0400.csv",
                      start_day = "2019/8/29",
                      end_day = "2020/04/12",
                      Partition_Way = 1)
@@ -66,7 +64,7 @@ ggbiplot(PCAweather,alpha = 0.01)
 
 
 #### bestsubset regression ####
-regfit.full = regsubsets(Dataset_day[,"AirTC_Avg.y"]~.,Dataset_day[,2:12],nvmax =11 , nbest = 3)
+regfit.full = regsubsets(Dataset_day[,"AirTC_Avg.y"]~.,Dataset_day[,2:9],nvmax =11 , nbest = 3)
 reg.summary = summary(regfit.full)
 # confirm plot: check adjr2,cp,bic
 
@@ -107,7 +105,13 @@ model3 <- train(Dataset_day[,names(md3)[-1]], Dataset_day[,"AirTC_Avg.y"], metho
 # choose the win model
 
 basic_mat = model.matrix(Dataset_day[,"AirTC_Avg.y"]~.,Dataset_day[,names(md1)[-1]])
+
 predict = basic_mat %*% md1
+
+ord = order(basic_mat[,2])
+sort.predict = basic_mat[ord,] %*% md1
+
+
 
 residual.pre = Dataset_day$AirTC_Avg.y-predict
 count <- 1:length(residual.pre)
@@ -170,6 +174,11 @@ out = predict+mean.line$fit
 
 predictors = as.numeric(predict+mean.line$fit)
 Reality = Dataset_day[,"AirTC_Avg.y"]
+set.seed(15112)
+sample(Reality,5000)
+sample(sort.predict,5000)
+plot(Reality[ord]-predictors[ord])
+plot(Reality[ord]-sort.predict)
 
 dat = data_frame(predictors, Reality)
 library(ggplot2)

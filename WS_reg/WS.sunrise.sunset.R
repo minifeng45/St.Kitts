@@ -22,7 +22,7 @@ SunriseSunset_time = function(
   timeperiod = matrix(day,nrow  = 1)
   
   sunriset_second = t(apply(timeperiod,2,ss))
-  
+
   inform = data.frame(day,sunriset_second)
   colnames(inform) = c("Date","Sunrise","Sunset")
   return(inform)

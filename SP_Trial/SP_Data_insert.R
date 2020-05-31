@@ -9,18 +9,18 @@ harvest_day = c("11/11","11/18","11/25","12/2",
                 "03/02","03/09","03/16","03/23")
 
 #insert data before TRIM treatment
-purple_before_trim = read_excel("~/Desktop//academy/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
+purple_before_trim = read_excel("~/Desktop/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
                       sheet = "Purple")
-red_before_trim = read_excel("~/Desktop//academy/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
+red_before_trim = read_excel("~/Desktop/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
                                 sheet = "Red")
 #insert data after TRIM treatment
-purple_trim = read_excel("~/Desktop//academy/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
+purple_trim = read_excel("~/Desktop/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
                                 sheet = "Purple(trim)")
-purple_notrim = read_excel("~/Desktop//academy/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
+purple_notrim = read_excel("~/Desktop/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
                          sheet = "Purple(notrim)")
-red_trim = read_excel("~/Desktop//academy/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
+red_trim = read_excel("~/Desktop/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
                          sheet = "Red(trim)")
-red_notrim = read_excel("~/Desktop//academy/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
+red_notrim = read_excel("~/Desktop/programing/R/St.Kitts/SP_Trial/甜椒田間試驗數據.xlsx", 
                          sheet = "Red(notrim)")
 
 

@@ -33,22 +33,6 @@ Dataclean = function(
 
     Rawdata_min = Rawdata_min[-1:-2,]
     
-    f =c()
-    b = c()
-    for (i in 2:ncol(Rawdata_min)) {
-      assertive.clause = !length(which(is.na(Rawdata_min[,i]))) #assertive.clause: FALSE->have NA
-      if (!assertive.clause) {
-        na.pos = which(is.na(Rawdata_min[,i]))
-        for (h in na.pos) {
-          f = h
-          b = h
-          while(is.na(Rawdata_min[f-1,i])){f = f-1}
-          while(is.na(Rawdata_min[b+1,i])){b = b+1}
-          Rawdata_min[h,i] = (Rawdata_min[f-1,i] + Rawdata_min[b+1,i])/2
-        }
-      }
-    }
-    
     print("Record.period")
     print(paste("start.time",Rawdata_min$TIMESTAMP[1]))
     print(paste("end.time",Rawdata_min$TIMESTAMP[nrow(Rawdata_min)]))
@@ -59,28 +43,6 @@ Dataclean = function(
     LaG = read.csv(filename, skip = 1)
     LaG = LaG[,-5:-7]
     colnames(LaG) = c("TIMESTAMP", "AirTC_Avg","RH","DewPointTC_Avg")
-    # if the unit is Fahrenheit 
-    
-    f =c()
-    b = c()
-    for (i in 2:ncol(LaG)) {
-      assertive.clause = !length(which(is.na(LaG[,i]))) #assertive.clause: FALSE->have NA
-      if (!assertive.clause) {
-        na.pos = which(is.na(LaG[,i]))
-        for (h in na.pos) {
-          f = h
-          b = h
-          while(is.na(LaG[f-1,i])){f = f-1}
-          LaG[h,i] = LaG[f-1,i]
-        }
-      }
-    }
-    
-    if(LaG$AirTC_Avg[1] > 50){ 
-      LaG$AirTC_Avg= round(((LaG$AirTC_Avg-32)*5/9),digits = 1)
-      LaG$DewPointTC_Avg= round(((LaG$DewPointTC_Avg-32)*5/9),digits = 1)
-      LaG$TIMESTAMP = as.character(LaG$TIMESTAMP)
-    }
     print(paste("start.time",LaG$TIMESTAMP[1]))
     print(paste("end.time",LaG$TIMESTAMP[nrow(LaG)]))
     return(LaG)
