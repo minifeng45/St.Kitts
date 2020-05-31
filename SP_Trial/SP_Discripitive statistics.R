@@ -20,9 +20,9 @@ Week = rep(c(1:length(Harvest$Date)),2)
 
 ### reform to the plot-acceptable dataframe
 
-purple = data.frame(Weight = Harvest$Purple_weight,Variety = "Purple")
+purple = data.frame(Weight = Harvest$weight_purple,Variety = "Purple")
 
-red = data.frame(Weight = Harvest$Red_weight, Variety = "Red")
+red = data.frame(Weight = Harvest$weight_red, Variety = "Red")
 
 
 
@@ -67,7 +67,7 @@ p.overall.harvest = p.overall.harvest +
 #####Scatter of Temperature & Productivity Correlation####
 
 ## Purple 
-lm.p.data = data.frame(temperature = month_temp$temperature.average, weight =Harvest$Purple_weight )
+lm.p.data = data.frame(temperature = month_temp$temperature.average, weight =Harvest$weight_purple )
 lm_p = lm(weight~temperature,data =lm.p.data) %>%
   summary()
 
@@ -85,7 +85,7 @@ p.lm.purple = ggplot(lm.p.data,aes(x =temperature, y  =  weight))+
 
 
 ## Red
-lm.r.data = data.frame(temperature = month_temp$temperature.average, weight =Harvest$Red_weight)
+lm.r.data = data.frame(temperature = month_temp$temperature.average, weight =Harvest$weight_red)
 lm_r = lm(weight~temperature,data = lm.r.data)%>%
   summary()
 
@@ -101,7 +101,7 @@ p.lm.red = ggplot(lm.r.data,aes(x =temperature, y  =  weight))+
   annotate("text", x = 28.5, y = 25000, 
            label = lm.information.label.r)+
   annotate("segment", x = 26.3, xend = 26.5, y = 5000, yend = 9500, colour = "grey", size=1, alpha=0.9, arrow=arrow())+
-  annotate("text", x = 26.3, y = 4300,label="Extra:Loess for fitting data",colour = "grey",size=4)
+  annotate("text", x = 26.6, y = 4300,label="Extra:Loess for fitting data",colour = "grey",size=4)
 
 ####Fruit Weight distribution####
 
@@ -130,7 +130,7 @@ Dataset_trimtrial.individual= rbind(
 
 # boxplot show the trim/notrim(purple) distribution
 p.box_trimtrial = ggplot(data = Dataset_trimtrial.individual, aes(x = Treatment))
-p.box_trimtrial = box_trimtrial + geom_boxplot(aes(y= Weight))+
+p.box_trimtrial = p.box_trimtrial + geom_boxplot(aes(y= Weight))+
   labs(title = "Fruit Weight Distribution",
        subtitle = "Purple",
        y = "Weight(g)")
@@ -143,18 +143,7 @@ t.test(Dataset_trimtrial.individual$Weight[which(Dataset_trimtrial.individual$Tr
 
 ## for purple
 
-Dataset_trimtrial.weekly.harvest.p = rbind(
-  
-  Harvest_treatment_p %>%
-    filter(Purple_trim != 0,Purple_notrim != 0)%>%
-    select(Weight = Purple_trim, mu = mu_trim, sd = sd_trim)%>%
-    mutate(Treatment = "Trim"),
-  
-  Harvest_treatment_p %>%
-    filter(Purple_trim != 0,Purple_notrim != 0)%>%
-    select(Weight = Purple_notrim, mu = mu_notrim, sd = sd_notrim)%>%
-    mutate(Treatment = "Notrim")
-) %>%
+Dataset_trimtrial.weekly.harvest.p = Harvest_treatment_p %>%
   mutate(Week = rep(c(1:4),2))
 
 #Barchart, show total weight of Treatment or not
@@ -188,18 +177,7 @@ p.trimtrial.average.weight.p = ggplot(data = Dataset_trimtrial.weekly.harvest.p,
 
 ##for red
 
-Dataset_trimtrial.weekly.harvest.r = rbind(
-  
-  Harvest_treatment_r %>%
-    filter(Red_trim != 0,Red_notrim != 0)%>%
-    select(Weight = Red_trim, mu = mu_trim, sd = sd_trim)%>%
-    mutate(Treatment = "Trim"),
-  
-  Harvest_treatment_r %>%
-    filter(Red_trim != 0,Red_notrim != 0)%>%
-    select(Weight = Red_notrim, mu = mu_notrim, sd = sd_notrim)%>%
-    mutate(Treatment = "Notrim")
-) %>%
+Dataset_trimtrial.weekly.harvest.r = Harvest_treatment_r %>%
   mutate(Week = rep(c(1:4),2))
 
 #plot 
