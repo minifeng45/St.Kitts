@@ -11,6 +11,6 @@ The hub include data-processing code, datasource, plot of descriptive statistics
 [![Watch the video](https://github.com/supermonk00/St.Kitts/blob/master/Tomato_Trial/image/Bar.chart.race.cover.png)](https://github.com/supermonk00/St.Kitts/blob/master/Tomato_Trial/image/Bar.chart.race.cover.png)
 
 ### Fruit Weight Distribution
-[(https://github.com/supermonk00/St.Kitts/blob/master/Tomato_Trial/image/boxplot.jpeg)]
+![](https://github.com/supermonk00/St.Kitts/blob/master/Tomato_Trial/image/boxplot.jpeg)
 ### ANOVA Table
-[(https://github.com/supermonk00/St.Kitts/blob/master/Tomato_Trial/image/Anova.table.png)]
+![](https://github.com/supermonk00/St.Kitts/blob/master/Tomato_Trial/image/Anova.table.png)
