@@ -114,10 +114,7 @@ analytic.form$Replicate = as.factor(analytic.form$Replicate)
 # anova model build
 aov.model = lm(weight~Variety+Replicate, data=analytic.form) %>%
   aov() 
-  
 Test.anova = aov.model %>% summary()
-
-
 # extra: theoretically, LSD.test is unnecessary
 Test.LSD.Replicate = agricolae::LSD.test(aov.model,"Replicate")  
 Test.LSD.Variety = agricolae::LSD.test(aov.model,"Variety") 
