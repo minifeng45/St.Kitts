@@ -30,7 +30,7 @@ Dataclean = function(
                                             Rain_mm_Tot = col_number(),
                                             WindDir_SD1_WVT = col_number()),
                            skip = 1)
-
+    
     Rawdata_min = Rawdata_min[-1:-2,]
     
     print("Record.period")
@@ -48,4 +48,3 @@ Dataclean = function(
     return(LaG)
   }
 }
-

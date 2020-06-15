@@ -15,7 +15,7 @@ data_partition = function(
 ){
   
   Rawdata = Dataclean(filename = Datasource)
-  Way = switch(Partition_Way, "DayNight", "Monthly")
+  Way = switch(Partition_Way, "DayNight", "Monthly","9:00-17:00")
   
   if (Way == "DayNight") {
     
@@ -35,23 +35,26 @@ data_partition = function(
     dclmdat = c()
     for (i in 1:nrow(Sriseset)) {
       dclmdat = Rawdata_with_second %>% 
-        filter(TIMESasSECOND >= Sriseset[i,2], TIMESasSECOND <= Sriseset[i,3]) %>%
-        select(-TIMESasSECOND) %>%
+        dplyr::filter(TIMESasSECOND >= Sriseset[i,2], TIMESasSECOND <= Sriseset[i,3]) %>%
         rbind(dclmdat,.)
     }
     # sort out night
     nclmdat = c()
     for (i in 1:(nrow(Sriseset)-1)) {
       nclmdat = Rawdata_with_second %>%
-        filter(TIMESasSECOND >= Sriseset[i,3], TIMESasSECOND <= Sriseset[i+1,2]) %>%
-        select(-TIMESasSECOND) %>%
+        dplyr::filter(TIMESasSECOND >= Sriseset[i,3], TIMESasSECOND <= Sriseset[i+1,2]) %>%
         rbind(nclmdat,.) 
     }
     
-    Output = list(Day = dclmdat, Night = nclmdat)
+    Output = list(Day = as.tbl(dclmdat), Night = as.tbl(nclmdat))
     return(Output)
   }
   
+  if (Way == "9:00-17:00"){
+    Output = Rawdata %>%
+      filter(hour(TIMESTAMP)>=9,hour(TIMESTAMP)<17)
+    return(Output)
+  }
   if (Way == "Monthly"){
     
     month = seq(as.Date(start_day), 
