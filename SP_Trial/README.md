@@ -10,11 +10,9 @@ The hub include data-processing code, datasource, plot of descriptive statistics
 ### 1.Overall harvest + Temperature information
 ![](https://github.com/supermonk00/St.Kitts/blob/master/SP_Trial/image/Overall.harvest.monthlytemperature.jpeg)
 ### 2.Correlation between harvest and temperature
-<div class="col-sm-6">
-</a>
-![](https://github.com/supermonk00/St.Kitts/blob/master/SP_Trial/image/Correlation.weight%7Etemperature.purple.jpeg)
-</a>
-</div>
+
+![](https://github.com/supermonk00/St.Kitts/blob/master/SP_Trial/image/Correlation.weight%7Etemperature.purple.jpeg){:height="50%" width="50%"}
+
 ### 3.Fruit weight distribution
 ![](https://github.com/supermonk00/St.Kitts/blob/master/SP_Trial/image/Overall.fruit.weight.distribution.jpeg)
 
