@@ -1,2 +1,2 @@
 # St.Kitts
-Hi, I'm in Saint Kitts, working for ICDF as substituted military service. This repository is for my all field trials experiment code here.
+During 2019.08-2020.09, I was working in St. Kitts & Nevis as an agricultural assistant. Using my expertise in data analysis, I help the agricultural sector by generating various reports within the context of agricultural adapataiton to climate varibility in St. Kitts. 
